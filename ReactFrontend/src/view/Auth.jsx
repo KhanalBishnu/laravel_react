@@ -5,6 +5,7 @@ import Create from './../pages/Create';
 import Dashboard from './../pages/Dashboard';
 import NotFound from './NotFound';
 import AuthUser from '../AuthUser';
+import UserList from '../pages/UserList';
 
 function Auth() {
     const {token,logout}=AuthUser();
@@ -36,7 +37,12 @@ function Auth() {
              
               <li className="nav-item">
                 <Link className="nav-link" to={'/create'}>
-                  Create
+                  Create User
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link className="nav-link" to={'/Users'}>
+                  View Users
                 </Link>
               </li>
              
@@ -65,6 +71,7 @@ function Auth() {
           <Route path="/" element={<Dashboard />} />
           <Route path="create" element={<Create />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/users" element={<UserList />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       {/* </ContextProvider> */}
