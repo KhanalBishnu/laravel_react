@@ -18,7 +18,7 @@ function Auth() {
      <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
         <div className="container-fluid">
           <Link className="navbar-brand" to={'/'}>
-            Home
+            Dashboard
           </Link>
           <button
             className="navbar-toggler"
@@ -39,13 +39,12 @@ function Auth() {
                   Create
                 </Link>
               </li>
-              <li className="nav-item">
-                <span className="nav-link" onClick={handleLogout}>
-                  Logout
-                </span>
-              </li>
+             
             </ul>
             <form className="d-flex">
+                <span className="nav-link text-white mx-4  m-auto " onClick={handleLogout}>
+                  Logout
+                </span>
               <input
                 className="form-control me-2"
                 type="search"
@@ -63,7 +62,7 @@ function Auth() {
       {/* <ContextProvider> */}
       <Routes>
 
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Dashboard />} />
           <Route path="create" element={<Create />} />
           <Route path="/dashboard" element={<Dashboard />} />
         <Route path="*" element={<NotFound />} />
