@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -29,4 +29,9 @@ Route::middleware('auth:api')->group(function(){
     Route::post('user/create',[AuthController::class,'createUser']);
     Route::get('user/delete/{id}',[AuthController::class,'deleteUser']);
     Route::get('user/edit/{id}',[AuthController::class,'editUser']);
+    Route::prefix('/dashboard')->name('dashboard.')->group(function(){
+        Route::controller(ProductController::class)->prefix('/products')->name('product.')->group(function(){
+            Route::get('','index')->name('index');
+        });
+    });
 });
