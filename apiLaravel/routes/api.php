@@ -32,6 +32,7 @@ Route::middleware('auth:api')->group(function(){
     Route::prefix('/dashboard')->name('dashboard.')->group(function(){
         Route::controller(ProductController::class)->prefix('/products')->name('product.')->group(function(){
             Route::get('','index')->name('index');
+            Route::post('','store')->name('store');
         });
     });
 });
