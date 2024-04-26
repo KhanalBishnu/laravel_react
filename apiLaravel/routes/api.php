@@ -33,6 +33,8 @@ Route::middleware('auth:api')->group(function(){
         Route::controller(ProductController::class)->prefix('/products')->name('product.')->group(function(){
             Route::get('','index')->name('index');
             Route::post('','store')->name('store');
+            Route::post('/update','update')->name('update');
+            Route::get('/delete/{id}','delete')->name('delete');
         });
     });
 });
