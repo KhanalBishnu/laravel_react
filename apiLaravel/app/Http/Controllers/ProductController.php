@@ -9,11 +9,17 @@ use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $data=$request->all();
+        $page=$data['page'] ?? 1;
+        $limit=$data['limit'] ?? 8;
+        $offset=($page-1)*$limit;
         return response()->json([
             'response' => true,
-            'products' => Product::with('media')->latest()->get()
+            // 'products' => Product::with('media')->where('user_id',auth()->id())->latest()->get()
+            'products' => Product::with('media')->offset($offset)->limit($limit)->latest()->get(),
+            'totalQuries' => Product::count()
         ]);
     }
     public function store(Request $request)

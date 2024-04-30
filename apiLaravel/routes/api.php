@@ -31,7 +31,7 @@ Route::middleware('auth:api')->group(function(){
     Route::get('user/edit/{id}',[AuthController::class,'editUser']);
     Route::prefix('/dashboard')->name('dashboard.')->group(function(){
         Route::controller(ProductController::class)->prefix('/products')->name('product.')->group(function(){
-            Route::get('','index')->name('index');
+            Route::post('/getList','index')->name('index');
             Route::post('','store')->name('store');
             Route::post('/update','update')->name('update');
             Route::get('/delete/{id}','delete')->name('delete');
