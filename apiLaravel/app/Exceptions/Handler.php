@@ -2,6 +2,8 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Http\Response;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
@@ -27,4 +29,20 @@ class Handler extends ExceptionHandler
             //
         });
     }
+    public function render($request, Throwable $e)
+{
+    if ($e instanceof AuthenticationException) {
+        return response()->json(
+            [
+                'type' => 'error',
+                'status' => Response::HTTP_UNAUTHORIZED,
+                'message' => 'Access Token expires',
+                'response'=>false
+            ],
+            Response::HTTP_UNAUTHORIZED
+        );
+    }
+
+    return parent::render($request, $e);
+}
 }

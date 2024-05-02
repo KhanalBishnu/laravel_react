@@ -5,8 +5,10 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Laravel\Passport\Passport;
 
 class AuthController extends Controller
 {
@@ -80,12 +82,17 @@ class AuthController extends Controller
                 'password' => $request->password,
             ];
             if (auth()->attempt($data)) {
+                Passport::personalAccessTokensExpireIn(now()->addSecond(5));
+                // Passport::personalAccessTokensExpireIn(now()->addHour(8));
                 $token = auth()->user()->createToken('token')->accessToken;
                 $user=User::with('media')->findOrFail(auth()->id());
                 return response()->json([
                     'response' => true,
                     'token' => $token,
                     'user' => $user,
+                    'expirationInMinutes' => auth()->user()->createToken('token')->token->expires_at->diffInSeconds(now()),
+
+
                 ]);
             } else {
                 return response()->json([
@@ -172,52 +179,5 @@ class AuthController extends Controller
         } catch (\Throwable $th) {
            return response()->json(['message'=>$th->getMessage(),'response'=>false]);
         }
-    }
-
-    public function test(){
-
-        foreach ($payload['customerContactDetails'] as &$contactDetail) {
-            $updateId = $contactDetail['updateId'];
-            $designationId = $contactDetail['personProfile']['personProfileImage']['collectionName'];
-        
-            // Get the person profile using the update ID
-            $personProfile = PersonProfile::where('id', $updateId)->first();
-        
-            // Delete all previous media files of the designation collection
-            $mediaCollection = $personProfile->getMedia('designation-' . $designationId);
-            foreach ($mediaCollection as $media) {
-                $media->delete();
-            }
-        
-            if (isset($contactDetail['personProfile']['id']) && 
-                !empty($contactDetail['personProfile']['personProfileImage']) &&
-                $contactDetail['personProfile']['personProfileImage']['modelId'] !== $updateId) {
-        
-                // Add the new media file
-                $newMediaFile = $personProfile
-                    ->addMediaFromUrl($contactDetail['personProfile']['personProfileImage']['personProfileImagePreview'])
-                    ->usingFileName($contactDetail['personProfile']['personProfileImage']['fileName'])
-                    ->toMediaCollection('designation-' . $designationId);
-        
-                // Update the modelId to match the updateId
-                $newMediaFile->update(['modelId' => $updateId]);
-        
-                // Update the personProfileImage with the new media file
-                $contactDetail['personProfile']['personProfileImage'] = $newMediaFile->toArray();
-            }
-        }
-        
-
-
-        // Assuming $personProfile is the model instance
-
-// Get all the media collections associated with the model
-$collections = $personProfile->media->pluck('collection_name')->unique();
-
-// Iterate over each collection and clear it
-$collections->each(function ($collectionName) use ($personProfile) {
-    $personProfile->clearMediaCollection($collectionName);
-});
-
     }
 }
