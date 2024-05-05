@@ -15,11 +15,11 @@ class ProductController extends Controller
         $page=$data['page'] ?? 1;
         $limit=$data['limit'] ?? 8;
         $offset=($page-1)*$limit;
+        $products=Product::with('media')->where('user_id',auth()->id())->latest()->get();
         return response()->json([
             'response' => true,
-            // 'products' => Product::with('media')->where('user_id',auth()->id())->latest()->get()
-            'products' => Product::with('media')->offset($offset)->limit($limit)->latest()->get(),
-            'totalQuries' => Product::count()
+            'products' => $products,
+            'totalQuries' => $products->count()
         ]);
     }
     public function store(Request $request)
