@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\RoleAndPermissionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +36,9 @@ Route::middleware('auth:api')->group(function(){
             Route::post('','store')->name('store');
             Route::post('/update','update')->name('update');
             Route::get('/delete/{id}','delete')->name('delete');
+        });
+        Route::controller(RoleAndPermissionController::class)->prefix('role-and-permission')->name('role-and-permission.')->group(function(){
+            Route::get('','index')->name('index');
         });
     });
 });

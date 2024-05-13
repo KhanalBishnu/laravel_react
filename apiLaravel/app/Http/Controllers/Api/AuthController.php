@@ -69,7 +69,7 @@ class AuthController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'email' => 'required|email',
-                'password' => 'required|min:6'
+                'password' => 'required'
             ]);
             if ($validator->fails()) {
                 return response()->json([
@@ -85,18 +85,18 @@ class AuthController extends Controller
                 // Passport::personalAccessTokensExpireIn(now()->addSecond(5));
                 Passport::personalAccessTokensExpireIn(now()->addHour(8));
                 $token = auth()->user()->createToken('token')->accessToken;
-                $user=User::with('media')->findOrFail(auth()->id());
+                $user=User::with('media','roles','roles.permissions')->findOrFail(auth()->id());
+                $roles=$user->roles->pluck('name') ?? [];
+                $permissions=$user->getPermissionsViaRoles()->pluck('name') ??[];
+                unset($user->roles);
                 return response()->json([
                     'response' => true,
                     'token' => $token,
                     'user' => $user,
                     'expirationInMinutes' => auth()->user()->createToken('token')->token->expires_at->diffInSeconds(now()),
-                    'roles'=>$user->roles->pluck('name') ?? [],
+                    'roles'=>$roles,
                     // 'permissions' => $user->roles->first()->permissions->pluck('name') ?? [],
-                    'user-permission'=>$user->getPermissionsViaRoles()->pluck('name') ??[]
-
-
-
+                    'userPermission'=>$permissions,
                 ]);
             } else {
                 return response()->json([
@@ -183,84 +183,5 @@ class AuthController extends Controller
         } catch (\Throwable $th) {
            return response()->json(['message'=>$th->getMessage(),'response'=>false]);
         }
-    }
-/* 
-public function test(){
-
-    foreach ($contact_details as $contact_detail) {
-        if ($contact_detail['update_id'] != null) {
-            $person_profile = PersonProfile::find($contact_detail['update_id']);
-            if ($person_profile) {
-                $personData = $person_profile['person_profile'];
-                if ($personData['first_name'] !== null && $personData['first_name'] !== '') {
-                    $customer_kyc_designations_id[] = $person_profile['designation_id'];
-                    foreach ($personData['person_profile_emails'] as $email) {
-                        $email['customer_kyc_id'] = $jsonData['id'];
-                        $email['person_profile_id'] = $person_profile['id'];
-                        $this->personProfileEmailRepo->store($email);
-    
-                        if ($email['is_email']) {
-                            CustomerCcEmail::create([
-                                'customer_kyc_id' => $jsonData['id'],
-                                'email' => $email['email_id'],
-                            ]);
-                        }
-                    }
-    
-                    foreach ($personData['person_profile_telephones'] as $telephone) {
-                        $telephone['customer_kyc_id'] = $jsonData['id'];
-                        $telephone['person_profile_id'] = $person_profile['id'];
-                        $this->personProfileTelephoneRepo->store($telephone);
-    
-                        if ($telephone['is_sms'] && strlen($telephone['phone_number']) == 10) {
-                            DB::table('customer_sms_numbers')->insert([
-                                'customer_kyc_id' => $jsonData['id'],
-                                'phone_number' => $telephone['phone_number'],
-                            ]);
-                        }
-                    }
-                    $person_profile->update($contact_detail['person_profile']);
-                } else {
-                    // Handle cases where first_name is empty
-                    $this->handleEmptyFirstName($person_profile, $jsonData);
-                }
-            }
-        } else {
-            // Handle cases where update_id is null
-        }
-    }
-}
-    
-    
-    private function handleEmptyFirstName($person_profile, $jsonData)
-    {
-        $contactDetail = CustomerContactDetail::where('customer_kyc_id', $jsonData['id'])
-            ->where('person_profile_id', $person_profile->id)
-            ->first();
-    
-        if ($contactDetail && $contactDetail['designation_id'] != 1) {
-            $this->deletePersonProfile($person_profile, $jsonData);
-        }
-    }
-    
-    private function deletePersonProfile($person_profile, $jsonData)
-    {
-        $person_profile->personProfileTelephones()->delete();
-        $person_profile->personProfileEmails()->delete();
-        $person_profile->customerContactDetail()->delete();
-    
-        $user = User::where('person_profile_id', $person_profile->id)->first();
-        if ($user) {
-            $deginationUser = CustomerContactDetail::where('customer_kyc_id', $jsonData['id'])
-                ->where('designation_id', 1)
-                ->first();
-            if ($deginationUser) {
-                $user->person_profile_id = $deginationUser->person_profile_id;
-                $user->save();
-            }
-        }
-    
-        $person_profile->delete();
-    } */
-    
+    }    
 }
