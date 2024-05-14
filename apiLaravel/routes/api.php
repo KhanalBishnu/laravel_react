@@ -39,6 +39,8 @@ Route::middleware('auth:api')->group(function(){
         });
         Route::controller(RoleAndPermissionController::class)->prefix('role-and-permission')->name('role-and-permission.')->group(function(){
             Route::get('','index')->name('index');
+            Route::post('/store','store')->name('store');
+            Route::get('/delete/{role}','delete')->name('delete');
         });
     });
 });
