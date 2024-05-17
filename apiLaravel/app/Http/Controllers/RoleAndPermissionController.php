@@ -45,4 +45,14 @@ class RoleAndPermissionController extends Controller
 
         }
     }
+
+    public function getRolePermissions(Role $role){
+        try {
+           $rolesNames=$role->permissions->pluck('name');
+            return $this->jsonResponse($rolesNames,null,true,200);
+
+        } catch (\Throwable $th) {
+            return $this->jsonResponse(null,$th->getMessage(),false,403);
+        }
+    }
 }
