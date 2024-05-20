@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoleAndPermissionController;
 use Illuminate\Http\Request;
@@ -45,8 +46,11 @@ Route::middleware('auth:api')->group(function(){
             Route::get('/getPermissionList/{role}','getPermissionList')->name('getPermissionList');
             Route::get('/getRolePermission/{role}','getRolePermissions')->name('getRolePermissions');
             Route::post('/update','update')->name('update');
-
-
+        });
+        Route::controller(UserController::class)->prefix('user-management')->name('user-management.')->group(function(){
+            Route::get('','index')->name('index');
+            Route::post('/store','store')->name('store');
+           
         });
     });
 });
