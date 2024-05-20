@@ -29,6 +29,11 @@ class RoleAndPermissionController extends Controller
                $role= Role::create([
                     'name'=>$data['name']
                 ]);
+
+                if (!empty($data['permissionIds'])) {
+                    $permissionIds = array_map('intval', $data['permissionIds']);
+                    $role->syncPermissions($permissionIds);
+                }
             });
             return $this->jsonResponse($role,'Role Created Successfully',true,200);
         } catch (\Throwable $th) {
@@ -38,6 +43,7 @@ class RoleAndPermissionController extends Controller
 
     public function delete(Role $role){
         try {
+            $role->syncPermissions([]);
             $role->delete();
             return $this->jsonResponse(null,'Role Deleted Successfully',true,200);
             
@@ -63,7 +69,6 @@ class RoleAndPermissionController extends Controller
                 $query->select('id', 'name', 'module_id');
             }])->get();
             $data['permissionIds']=getRolePermission($role);
-
             
             // foreach ($modules as $key => $module) {
             //     $modulePermission=$module->permissions->pluck('name')->toArray();
@@ -83,16 +88,39 @@ class RoleAndPermissionController extends Controller
     }
 
     public function update(Request $request){
-        // \Log::info($request->all());
         $data=$request->all();
-        try {
-            DB::transaction(function() use($data){
-               $role=Role::findOrFail($data['id']);
-               $role->update(['name'=>$data['name']]);
-               $role->syncPermissions($data['permissionIds']);
+        // \Log::info($data['permissionids']);
+          try {
+            DB::transaction(function() use($data) {
+                $role = Role::findOrFail($data['id']);
+                
+                $role->update(['name' => $data['name']]);
+                if (!empty($data['permissionids'])) {
+                    $permissionIds = array_map('intval', $data['permissionids']);
+                    $role->syncPermissions($permissionIds);
+                }else{
+                    $role->syncPermissions([]);
+
+                }
             });
+            
+            return $this->jsonResponse($data,'Role Updated Successfully',true,200);
+
         } catch (\Throwable $th) {
-            //throw $th;
+            return $this->jsonResponse(null,$th->getMessage(),false,403);
+
+        }
+    }
+
+    public function allPermissionList(){
+        try {
+            $modules= Module::with(['permissions' => function ($query) {
+                $query->select('id', 'name', 'module_id');
+            }])->get();
+            return $this->jsonResponse($modules,null,true,200);
+
+        } catch (\Throwable $th) {
+            return $this->jsonResponse(null,$th->getMessage(),false,403);
         }
     }
 
