@@ -8,40 +8,39 @@ use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-class UserManagementSeeder extends Seeder
+class ProductManagementSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        $roleAndPermissionModule=Module::create(['title'=>'User Management']);
-
+        $module=Module::create(['title'=>'Product']);
         $permissions=[
             [
-                'name'=>'View|'.$roleAndPermissionModule['title'],
-                'guard_name'=>'api',
-                'module_id'=>$roleAndPermissionModule['id']
-            ],
-            // [
-            //     'name'=>'View All|'.$roleAndPermissionModule['title'],
-            //     'guard_name'=>'api',
-            //     'module_id'=>$roleAndPermissionModule['id']
-            // ],
-            [
-                'name'=>'Create|'.$roleAndPermissionModule['title'],
-                'guard_name'=>'api',
-                'module_id'=>$roleAndPermissionModule['id']
+                'name'=>'View|'.$module['title'],
+                'module_id'=>$module['id'],
+                'guard_name'=>'api'
             ],
             [
-                'name'=>'Update|'.$roleAndPermissionModule['title'],
+                'name'=>'View All|'.$module['title'],
                 'guard_name'=>'api',
-                'module_id'=>$roleAndPermissionModule['id']
+                'module_id'=>$module['id']
             ],
             [
-                'name'=>'Delete|'.$roleAndPermissionModule['title'],
+                'name'=>'Create|'.$module['title'],
                 'guard_name'=>'api',
-                'module_id'=>$roleAndPermissionModule['id']
+                'module_id'=>$module['id']
+            ],
+            [
+                'name'=>'Update|'.$module['title'],
+                'guard_name'=>'api',
+                'module_id'=>$module['id']
+            ],
+            [
+                'name'=>'Delete|'.$module['title'],
+                'guard_name'=>'api',
+                'module_id'=>$module['id']
             ]
         ];
         $permissionIds=[];
@@ -51,5 +50,6 @@ class UserManagementSeeder extends Seeder
         }
         $adminRole=Role::where('name','Admin')->first();
         $adminRole->givePermissionTo($permissionIds);
+        
     }
 }

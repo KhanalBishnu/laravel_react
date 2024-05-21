@@ -15,11 +15,17 @@ class ProductController extends Controller
         $page=$data['page'] ?? 1;
         $limit=$data['limit'] ?? 8;
         $offset=($page-1)*$limit;
-        $products=Product::with('media')->where('user_id',auth()->id())->latest()->offset($offset)->limit($limit)->get();
+        $products=Product::with('media')
+        ->when(!auth()->user()->hasPermissionTo('View All|Product'),function($q){
+            $q->where('user_id',auth()->id());
+        });
+
+        $totalProducts=$products->count();
+        $products=$products->latest()->offset($offset)->limit($limit)->get();
         return response()->json([
             'response' => true,
             'products' => $products,
-            'totalQuries' => Product::where('user_id',auth()->id())->count()
+            'totalQuries' => $totalProducts
         ]);
     }
     public function store(Request $request)
@@ -115,4 +121,16 @@ class ProductController extends Controller
             ]);
         }
     }
+
+
+// $salesVisits = SalesVisit::select(
+//     'reasons_for_visit',
+//     DB::raw('DATE(created_at) as created_at'),
+//     'referred_by',
+//     DB::raw('MAX(id) as id'),
+//     DB::raw('GROUP_CONCAT(feedback SEPARATOR " ") as feedback')
+// )
+// ->groupBy('reasons_for_visit', 'created_at', 'referred_by')
+// ->get();
+
 }

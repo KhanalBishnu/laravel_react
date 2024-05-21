@@ -19,7 +19,7 @@ class UserController extends Controller
             //     $q->select('name');
             // }])->get();
 
-            $data['users']=User::with('roles')->get();
+            $data['users']=User::with('roles','media')->get();
             foreach ($data['users'] as $key => $user) {
               $user['role']=$user->roles->pluck('name');
               $user->unsetRelation('roles');
@@ -68,6 +68,54 @@ class UserController extends Controller
           
         } catch (\Throwable $th) {
            return  $this->jsonResponse(null,$th->getMessage(),false,500);
+        }
+    }
+
+    public function update(Request $request){
+        $data=$request->all();
+        try {
+            $validation = Validator::make($data, [
+                'name' => 'required|string',
+                'email' => 'required|email|unique:users,email,'.$data['id'],
+                'file' => 'nullable|mimes:jpg,png'
+
+            ]);
+            if ($validation->fails()) {
+                return response()->json([
+                    'response' => false,
+                    'message' => $validation->errors()
+                ]);
+            }
+            DB::transaction(function() use($request,$data){
+                $user=User::findOrFail($data['id']);
+                $user->update([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                ]);
+                if(array_key_exists('file',$data)){
+                    if($user->hasMedia('user-img')){
+                        $user->clearMediaCollection('user-img');
+                    }
+                    $user->addMedia($data['file'])->toMediaCollection('user-img');
+                }
+                if(!empty($data['roleId'])){
+                    $role=array_map('intval',[$data['roleId']]);
+                    $user->syncRoles($role);
+                }
+            });
+           return $this->jsonResponse(null,'User Updated Successfully',true,200);
+          
+        } catch (\Throwable $th) {
+           return  $this->jsonResponse(null,$th->getMessage(),false,500);
+        }
+    }
+
+    public function delete(User $user){
+        try {
+            $user->delete();
+            return  $this->jsonResponse(null,'User Deleted Successfully',true,500);
+        } catch (\Throwable $th) {
+            return  $this->jsonResponse(null,$th->getMessage(),false,500);
         }
     }
 }
