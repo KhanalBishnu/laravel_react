@@ -122,15 +122,21 @@ class ProductController extends Controller
         }
     }
 
+    public function NoAuthProduct(Request $request)
+    {
+        try {
+            $data=$request->all();
+            $page=$data['page'] ?? 1;
+            $limit=$data['limit'] ?? 12;
+            $offset=($page-1)*$limit;
+            $products=Product::with('media');
+            $data['totalProducts']=$products->count();
+            $data['products']=$products->latest()->offset($offset)->limit($limit)->get();
+            return $this->jsonResponse($data,null,true,200);
+        } catch (\Throwable $th) {
+            return $this->jsonResponse(null,$th->getMessage(),true,200);
 
-// $salesVisits = SalesVisit::select(
-//     'reasons_for_visit',
-//     DB::raw('DATE(created_at) as created_at'),
-//     'referred_by',
-//     DB::raw('MAX(id) as id'),
-//     DB::raw('GROUP_CONCAT(feedback SEPARATOR " ") as feedback')
-// )
-// ->groupBy('reasons_for_visit', 'created_at', 'referred_by')
-// ->get();
-
+        }
+       
+    }
 }

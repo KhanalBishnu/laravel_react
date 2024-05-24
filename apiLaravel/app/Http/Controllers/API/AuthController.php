@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Passport\Passport;
@@ -88,6 +89,9 @@ class AuthController extends Controller
                 $user=User::with('media','roles','roles.permissions')->findOrFail(auth()->id());
                 $roles=$user->roles->pluck('name') ?? [];
                 $permissions=$user->getPermissionsViaRoles()->pluck('name') ??[];
+
+                session(['permissions' => $permissions]);
+
                 unset($user->roles);
                 return response()->json([
                     'response' => true,
@@ -183,5 +187,19 @@ class AuthController extends Controller
         } catch (\Throwable $th) {
            return response()->json(['message'=>$th->getMessage(),'response'=>false]);
         }
-    }    
+    } 
+    public function getPermissions() {
+     
+        try {
+            $user=Auth::user();
+            // $permissions = session('permissions');
+            $permissions=$user->getPermissionsViaRoles()->pluck('name') ??[];
+
+            return $this->jsonResponse($permissions,null,true,200);
+          
+        } catch (\Throwable $th) {
+            return  $this->jsonResponse(null,$th->getMessage(),false,500);
+
+        }
+    }
 }

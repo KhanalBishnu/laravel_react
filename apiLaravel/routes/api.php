@@ -25,7 +25,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('register',[AuthController::class,'register']);
 Route::post('login',[AuthController::class,'login']);
+Route::post('/products',[ProductController::class,'NoAuthProduct']);
+
 Route::middleware('auth:api')->group(function(){
+    Route::get('permissions',[AuthController::class,'getPermissions']);
     Route::get('user-info',[AuthController::class,'userInfo']);
     Route::get('users',[AuthController::class,'users']);
     Route::post('user/create',[AuthController::class,'createUser']);
