@@ -134,7 +134,18 @@ class ProductController extends Controller
             $data['products']=$products->latest()->offset($offset)->limit($limit)->get();
             return $this->jsonResponse($data,null,true,200);
         } catch (\Throwable $th) {
-            return $this->jsonResponse(null,$th->getMessage(),true,200);
+            return $this->jsonResponse(null,$th->getMessage(),false,200);
+
+        }
+       
+    }
+    public function NoAuthProductDetail($id)
+    {
+        try {
+            $product=Product::with('media')->findOrFail($id);
+            return $this->jsonResponse($product,null,true,200);
+        } catch (\Throwable $th) {
+            return $this->jsonResponse(null,$th->getMessage(),false,200);
 
         }
        
