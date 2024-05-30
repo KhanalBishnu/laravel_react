@@ -127,7 +127,7 @@ class ProductController extends Controller
         try {
             $data=$request->all();
             $page=$data['page'] ?? 1;
-            $limit=$data['limit'] ?? 12;
+            $limit=$data['limit'] ??8;
             $offset=($page-1)*$limit;
             $products=Product::with('media');
             $data['totalProducts']=$products->count();
