@@ -129,7 +129,12 @@ class ProductController extends Controller
             $page=$data['page'] ?? 1;
             $limit=$data['limit'] ??8;
             $offset=($page-1)*$limit;
+            $name=$data['name'] ?? null;
+
             $products=Product::with('media');
+            if($name){
+                $products->where('title','like',"%$name%");
+            }
             $data['totalProducts']=$products->count();
             $data['products']=$products->latest()->offset($offset)->limit($limit)->get();
             return $this->jsonResponse($data,null,true,200);
@@ -151,54 +156,4 @@ class ProductController extends Controller
        
     }
 }
-// @foreach ($salesVisit as $key => $s)
-//     @php
-//         $discussionCount = count($s->discussionSalesVisit);
-//         $rowSpan = $discussionCount > 0 ? $discussionCount : 1;
-//     @endphp
-//     @if ($discussionCount > 0)
-//         @foreach ($s->discussionSalesVisit as $discussionKey => $item)
-//             <tr>
-//                 <td style="border: 1px solid black">{{ $s['date'] }}</td>
-//                 <td style="border: 1px solid black">{{ $s['client_company_name'] }}</td>
-//                 <td style="border: 1px solid black">
-//                     @if (count($salesPersons[$key]) > 0)
-//                         @foreach ($salesPersons[$key] as $i)
-//                             {{ $i }}@if (!$loop->last),@endif
-//                         @endforeach
-//                     @endif
-//                 </td>
-//                 <td style="border: 1px solid black">{{ $s['location'] }}</td>
-//                 <td style="border: 1px solid black">{{ $s['contact_person'] }}</td>
-//                 <td style="border: 1px solid black">{{ $s['contact_number'] }}</td>
-//                 <td style="border: 1px solid black">{{ $s['from_time'] }}</td>
-//                 <td style="border: 1px solid black">{{ $s['to_time'] }}</td>
-//                 <td style="border: 1px solid black">{{ $s['activity_type'] }}</td>
-//                 <td style="border: 1px solid black">{{ $s['reasons_for_visit'] }}</td>
-//                 <td style="border: 1px solid black">{{ $item['is_positive'] == 1 ? "Positive" : "Negative" }}</td>
-//                 <td style="border: 1px solid black;border-right:0px">{{ $item->users->personProfile['full_name'] }}: {{ $item['discussion'] }}</td>
-//             </tr>
-//         @endforeach
-//     @else
-//         <tr>
-//             <td style="border: 1px solid black">{{ $s['date'] }}</td>
-//             <td style="border: 1px solid black">{{ $s['client_company_name'] }}</td>
-//             <td style="border: 1px solid black">
-//                 @if (count($salesPersons[$key]) > 0)
-//                     @foreach ($salesPersons[$key] as $i)
-//                         {{ $i }}@if (!$loop->last),@endif
-//                     @endforeach
-//                 @endif
-//             </td>
-//             <td style="border: 1px solid black">{{ $s['location'] }}</td>
-//             <td style="border: 1px solid black">{{ $s['contact_person'] }}</td>
-//             <td style="border: 1px solid black">{{ $s['contact_number'] }}</td>
-//             <td style="border: 1px solid black">{{ $s['from_time'] }}</td>
-//             <td style="border: 1px solid black">{{ $s['to_time'] }}</td>
-//             <td style="border: 1px solid black">{{ $s['activity_type'] }}</td>
-//             <td style="border: 1px solid black">{{ $s['reasons_for_visit'] }}</td>
-//             <td style="border: 1px solid black">{{ $s['is_positive'] == 1 ? "Positive" : "Negative" }}</td>
-//             <td style="border: 1px solid black;border-right:0px">{{ $s['discussion'] }}</td>
-//         </tr>
-//     @endif
-// @endforeach
+
