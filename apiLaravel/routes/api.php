@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\EsewaController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoleAndPermissionController;
 use Illuminate\Http\Request;
@@ -27,6 +28,13 @@ Route::post('register',[AuthController::class,'register']);
 Route::post('login',[AuthController::class,'login']);
 Route::post('/products',[ProductController::class,'NoAuthProduct']);
 Route::get('/product/details/{id}',[ProductController::class,'NoAuthProductDetail']);
+
+
+Route::post('/esewa/initiate', [EsewaController::class, 'initiatePayment']);
+Route::post('/esewa/verify', [EsewaController::class, 'verifyPayment']);
+Route::get('/esewa/success', [EsewaController::class, 'success'])->name('esewa.success');
+Route::get('/esewa/failure', [EsewaController::class, 'failure'])->name('esewa.failure');
+
 
 
 Route::middleware('auth:api')->group(function(){
