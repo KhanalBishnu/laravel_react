@@ -1,0 +1,50 @@
+namespace App\Traits;
+
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Validator;
+
+trait ValidatesEmail
+{
+    public static function bootValidatesEmail()
+    {
+        static::creating(function ($model) {
+            $model->validateEmail();
+        });
+
+        static::updating(function ($model) {
+            $model->validateEmail();
+        });
+    }
+
+    protected function validateEmail()
+    {
+        // Use the email field property if it exists
+        if (isset($this->emailField) && array_key_exists($this->emailField, $this->attributes) && !empty($this->attributes[$this->emailField])) {
+            $validator = Validator::make(
+                [$this->emailField => $this->attributes[$this->emailField]],
+                [$this->emailField => 'email|unique:'.$this->getTable().','.$this->emailField.','.$this->id],
+                [
+                    $this->emailField.'.email' => 'The email must be a valid email address.',
+                    $this->emailField.'.unique' => 'The email has already been taken.'
+                ]
+            );
+
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+        }
+    }
+}
+
+
+use App\Traits\ValidatesEmail;
+
+class User extends Model
+{
+    use ValidatesEmail;
+
+    protected $fillable = ['name', 'email'];
+
+    // Specify the email field name
+    protected $emailField = 'email';
+}
