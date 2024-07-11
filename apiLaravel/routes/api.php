@@ -64,7 +64,7 @@ Route::middleware('auth:api')->group(function(){
             Route::get('','index')->name('index')->middleware(['can:View|User Management']);
             Route::post('/store','store')->name('store')->middleware(['can:Create|User Management']);
             Route::post('/update','update')->name('update')->middleware(['can:Update|User Management']);
-            Route::get('/delete/{role}','delete')->name('delete')->middleware(['can:Delete|User Management']);           
+            Route::get('/delete/{user}','delete')->name('delete')->middleware(['can:Delete|User Management']);           
         });
     });
 });

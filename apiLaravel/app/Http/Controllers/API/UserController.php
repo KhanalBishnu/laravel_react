@@ -40,12 +40,10 @@ class UserController extends Controller
                 'file' => 'nullable|mimes:jpg,png'
 
             ]);
-            if ($validation->fails()) {
-                return response()->json([
-                    'response' => false,
-                    'message' => $validation->errors()
-                ]);
+            if ($validation->fails()) {    
+                return  $this->jsonResponse(null,$validation->errors()->first(),false,400);
             }
+
             DB::transaction(function() use($request,$data){
                 $password='asdfgh137';
                 $user = User::create([
@@ -62,7 +60,7 @@ class UserController extends Controller
                 }
                 $data['user']=$user;
                 $data['password']=$password;
-                Notification::route('mail',$user->email)->notify(new SendCredentialNotify($data));
+                // Notification::route('mail',$user->email)->notify(new SendCredentialNotify($data));
             });
            return $this->jsonResponse(null,'User Created Successfully',true,200);
           
@@ -81,10 +79,7 @@ class UserController extends Controller
 
             ]);
             if ($validation->fails()) {
-                return response()->json([
-                    'response' => false,
-                    'message' => $validation->errors()
-                ]);
+                return  $this->jsonResponse(null,$validation->errors()->first(),false,400);
             }
             DB::transaction(function() use($request,$data){
                 $user=User::findOrFail($data['id']);
@@ -113,7 +108,7 @@ class UserController extends Controller
     public function delete(User $user){
         try {
             $user->delete();
-            return  $this->jsonResponse(null,'User Deleted Successfully',true,500);
+            return  $this->jsonResponse(null,'User Deleted Successfully',true,200);
         } catch (\Throwable $th) {
             return  $this->jsonResponse(null,$th->getMessage(),false,500);
         }

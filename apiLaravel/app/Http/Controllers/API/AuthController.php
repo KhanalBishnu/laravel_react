@@ -25,15 +25,12 @@ class AuthController extends Controller
                 'name' => 'required|string',
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required|string|min:6',
-                'confirm_password'=>'required|same:password',
-                'file' => 'required|mimes:jpg,png'
+                // 'confirm_password'=>'required|same:password',
+                // 'file' => 'required|mimes:jpg,png'
 
             ]);
             if ($validation->fails()) {
-                return response()->json([
-                    'response' => false,
-                    'message' => $validation->errors()
-                ]);
+                return $this->jsonResponse(null,$validation->errors()->first(),false,500);
             }
            $response= DB::transaction(function() use($request,$data){
                 $user = User::create([
@@ -51,17 +48,14 @@ class AuthController extends Controller
                 ];
             });
            
-            return response()->json([
+            $data=[
                 'token' => $response['token'],
                 'user' => $response['user'],
-                'response' => true,
-                'message'=>'User Register Successfully! '
-            ]);
+            ];
+            return $this->jsonResponse($data,'User Register Successfully!',true,200);
+
         } catch (\Throwable $th) {
-            return response()->json([
-                'response' => false,
-                'message' => $th->getMessage()
-            ]);
+            return $this->jsonResponse(null,$th->getMessage(),false,500);
         }
     }
 
@@ -73,10 +67,8 @@ class AuthController extends Controller
                 'password' => 'required'
             ]);
             if ($validator->fails()) {
-                return response()->json([
-                    'response' => false,
-                    'message' => $validator->errors()
-                ]);
+                return $this->jsonResponse(null,$validator->errors()->first(),false,500);
+
             }
             $data = [
                 'email' => $request->email,
