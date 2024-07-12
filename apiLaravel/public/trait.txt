@@ -1,50 +1,113 @@
-namespace App\Traits;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
-use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Validator;
-
-trait ValidatesEmail
+public function importData(Request $request)
 {
-    public static function bootValidatesEmail()
-    {
-        static::creating(function ($model) {
-            $model->validateEmail();
-        });
+    $import = new ValidRatesImport();
 
-        static::updating(function ($model) {
-            $model->validateEmail();
-        });
+    DB::beginTransaction();
+    try {
+        Excel::import($import, $request->file('file'));
+
+        if (!empty($import->errors)) {
+            DB::rollBack();
+            return response()->json(['errors' => $import->errors], 422);
+        }
+
+        // Batch insert valid rates
+        ImportedValidRate::insert($import->validRates);
+
+        DB::commit();
+        return response()->json(['message' => 'Data imported successfully'], 200);
+    } catch (\Throwable $th) {
+        DB::rollBack();
+        Log::error('Error during import: ' . $th->getMessage());
+        return response()->json(['errors' => ['An error occurred during import. Please try again.']], 500);
     }
+}
 
-    protected function validateEmail()
+
+
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Illuminate\Support\Collection;
+
+class ValidRatesImport implements ToCollection, WithHeadingRow
+{
+    public $errors = [];
+    public $validRates = []; // Array to hold valid rates
+
+    public function collection(Collection $rows)
     {
-        // Use the email field property if it exists
-        if (isset($this->emailField) && array_key_exists($this->emailField, $this->attributes) && !empty($this->attributes[$this->emailField])) {
-            $validator = Validator::make(
-                [$this->emailField => $this->attributes[$this->emailField]],
-                [$this->emailField => 'email|unique:'.$this->getTable().','.$this->emailField.','.$this->id],
-                [
-                    $this->emailField.'.email' => 'The email must be a valid email address.',
-                    $this->emailField.'.unique' => 'The email has already been taken.'
-                ]
-            );
+        $isFirstRow = true;
+        $consecutiveEmptyRows = 0;
+
+        foreach ($rows as $row) {
+            if ($isFirstRow && $this->isEmptyRow($row)) {
+                // Return an error if the first row after the header is empty
+                $this->errors[] = 'The first row after the header cannot be empty.';
+                return;
+            }
+
+            if ($this->isEmptyRow($row)) {
+                $consecutiveEmptyRows++;
+                if ($consecutiveEmptyRows > 1) {
+                    // Stop processing if consecutive empty rows are found
+                    break;
+                }
+                continue;
+            } else {
+                $consecutiveEmptyRows = 0; // Reset counter if row is not empty
+            }
+
+            // Validation rules
+            $validator = Validator::make($row->toArray(), [
+                '0' => 'required|string', // Index for freight_type
+                // Add other validation rules as needed
+            ]);
 
             if ($validator->fails()) {
-                throw new ValidationException($validator);
+                // Collect errors for non-empty rows
+                $this->errors[] = $validator->errors()->all();
+            } else {
+                try {
+                    $validRate = [
+                        'freight_type' => $row[0],
+                        // Add other attributes as needed
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+
+                    // Add to the validRates array
+                    $this->validRates[] = $validRate;
+                } catch (\Throwable $th) {
+                    // Log the exception
+                    Log::error('Error importing row: ' . $th->getMessage());
+                    $this->errors[] = $th->getMessage();
+                }
+            }
+
+            $isFirstRow = false;
+        }
+    }
+
+    public function startRow(): int
+    {
+        return 2; // Start from the second row
+    }
+
+    private function isEmptyRow($row)
+    {
+        foreach ($row as $cell) {
+            if (!is_null($cell) && $cell !== '') {
+                return false;
             }
         }
+        return true;
     }
 }
 
-
-use App\Traits\ValidatesEmail;
-
-class User extends Model
-{
-    use ValidatesEmail;
-
-    protected $fillable = ['name', 'email'];
-
-    // Specify the email field name
-    protected $emailField = 'email';
-}
