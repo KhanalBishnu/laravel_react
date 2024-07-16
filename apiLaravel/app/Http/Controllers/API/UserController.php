@@ -13,18 +13,26 @@ use Validator;
 
 class UserController extends Controller
 {
-    public function index(){
+    public function index(Request $request){
+        $data=$request->all();
+        $page=$data['page']?? 1;
+        $limit=$data['paginatedValue'];
+        $offset=($page-1)*$limit;
         try {
             // $data['users']=User::with(['roles'=>function($q){
             //     $q->select('name');
             // }])->get();
 
-            $data['users']=User::with('roles','media')->get();
+            $user=User::with('roles','media');
+            $data['total']=$user->count();
+            $data['users']=$user->limit($limit)->offset($offset)->get();
+
             foreach ($data['users'] as $key => $user) {
               $user['role']=$user->roles->pluck('name');
               $user->unsetRelation('roles');
             }
             $data['roles']=Role::get(['id','name']);
+            $data['limit']=$limit;
             
            return $this->jsonResponse($data,null,true,200);
         } catch (\Throwable $th) {
