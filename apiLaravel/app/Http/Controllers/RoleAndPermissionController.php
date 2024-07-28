@@ -10,9 +10,14 @@ use App\Models\Module;
 
 class RoleAndPermissionController extends Controller
 {
-    public function index(){
-        $roles=Role::all();
-        return $this->jsonResponse($roles, null,true,200);
+    public function index(Request $request){
+        $data=$request->all();
+        $page=$data['page']?? 1;
+        $limit=$data['paginatedValue'];
+        $offset=($page-1)*$limit;
+        $data['total']=Role::count();
+        $data['items']=Role::offset($offset)->limit($limit)->get();
+        return $this->jsonResponse($data, null,true,200);
     }
 
     public function store(Request $request){

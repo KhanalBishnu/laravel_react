@@ -52,7 +52,7 @@ Route::middleware('auth:api')->group(function(){
             Route::get('/delete/{id}','delete')->name('delete')->middleware(['can:Delete|Product']);
         });
         Route::controller(RoleAndPermissionController::class)->prefix('role-and-permission')->name('role-and-permission.')->group(function(){
-            Route::get('','index')->name('index')->middleware(['can:View|Role And Permission']);
+            Route::post('','index')->name('index')->middleware(['can:View|Role And Permission']);
             Route::post('/store','store')->name('store')->middleware(['can:Create|Role And Permission']);
             Route::get('/delete/{role}','delete')->name('delete')->middleware(['can:Delete|Role And Permission']);
             Route::get('/allPermissionList','allPermissionList')->name('allPermissionList')->middleware(['can:View|Role And Permission']);
