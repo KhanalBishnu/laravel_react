@@ -93,15 +93,14 @@ class RoleAndPermissionController extends Controller
     }
 
     public function update(Request $request){
-        $data=$request->all();
-        // \Log::info($data['permissionids']);
+        $data=$request->all();  
           try {
             DB::transaction(function() use($data) {
                 $role = Role::findOrFail($data['id']);
                 
                 $role->update(['name' => $data['name']]);
-                if (!empty($data['permissionids'])) {
-                    $permissionIds = array_map('intval', $data['permissionids']);
+                if (!empty($data['permissionIds'])) {
+                    $permissionIds = array_map('intval', $data['permissionIds']);
                     $role->syncPermissions($permissionIds);
                 }else{
                     $role->syncPermissions([]);
