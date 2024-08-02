@@ -12,12 +12,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
-        $this->call(RoleSeeder::class);
-        \App\Models\Product::factory(50)->create();
-        $this->call(PermissionSeeder::class);
-        $this->call(UserManagementSeeder::class);
-        $this->call(ProductManagementSeeder::class);
+        // // \App\Models\User::factory(10)->create();
+        // $this->call(RoleSeeder::class);
+        // \App\Models\Product::factory(50)->create();
+        // $this->call(PermissionSeeder::class);
+        // $this->call(UserManagementSeeder::class);
+        // $this->call(ProductManagementSeeder::class);
+        // $this->call(CategoryProductSeeder::class);
+
+        // \App\Models\CategoryProduct::factory(50)->create();
 
     }
 }

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\CategoryProductController;
 use App\Http\Controllers\EsewaController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoleAndPermissionController;
@@ -45,6 +46,12 @@ Route::middleware('auth:api')->group(function(){
     Route::get('user/delete/{id}',[AuthController::class,'deleteUser']);
     Route::get('user/edit/{id}',[AuthController::class,'editUser']);
     Route::prefix('/dashboard')->name('dashboard.')->group(function(){
+        Route::controller(CategoryProductController::class)->prefix('/category-product')->name('category_product.')->group(function(){
+            Route::post('/getList','index')->name('index')->middleware(['can:View|Category Product']);
+            Route::post('','store')->name('store')->middleware(['can:Create|Category Product']);
+            Route::post('/update','update')->name('update')->middleware(['can:Update|Category Product']);
+            Route::get('/delete/{id}','delete')->name('delete')->middleware(['can:Delete|Category Product']);
+        });
         Route::controller(ProductController::class)->prefix('/products')->name('product.')->group(function(){
             Route::post('/getList','index')->name('index')->middleware(['can:View|Product']);
             Route::post('','store')->name('store')->middleware(['can:Create|Product']);
