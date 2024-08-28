@@ -13,7 +13,7 @@ class CategoryProductController extends Controller
     {
         $data=$request->all();
         $page=$data['page'] ?? 1;
-        $limit=$data['limit'] ?? 8;
+        $limit=$data['paginatedValue'] ?? 8;
         $offset=($page-1)*$limit;
         $category=CategoryProduct::with('media');
         $response['total']=$category->count();
@@ -29,7 +29,7 @@ class CategoryProductController extends Controller
             'file' => 'nullable|mimes:jpg,png',
         ]);
         if ($validation->fails()) {
-            return $this->jsonResponse(null,$validation->errors(),false,400);
+            return $this->jsonResponse(null,$validation->errors()->first(),false,400);
         }
         try {
             DB::transaction(function () use ($data) {
@@ -58,7 +58,7 @@ class CategoryProductController extends Controller
             'file' => 'nullable|mimes:jpg,png',
         ]);
         if ($validation->fails()) {
-            return $this->jsonResponse(null,$validation->errors(),false,400);
+            return $this->jsonResponse(null,$validation->errors()->first(),false,400);
         }
         try {
             DB::transaction(function () use ($data) {

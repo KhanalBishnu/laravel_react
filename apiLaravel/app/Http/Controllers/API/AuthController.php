@@ -181,13 +181,14 @@ class AuthController extends Controller
         }
     } 
     public function getPermissions() {
-     
         try {
             $user=Auth::user();
-            // $permissions = session('permissions');
-            $permissions=$user->getPermissionsViaRoles()->pluck('name') ??[];
+            if($user){
+                // $permissions = session('permissions');
+                $permissions=$user->getPermissionsViaRoles()->pluck('name') ??[];
+                return $this->jsonResponse($permissions,null,true,200);
+            }
 
-            return $this->jsonResponse($permissions,null,true,200);
           
         } catch (\Throwable $th) {
             return  $this->jsonResponse(null,$th->getMessage(),false,500);
