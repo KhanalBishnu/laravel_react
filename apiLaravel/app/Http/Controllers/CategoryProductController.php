@@ -95,4 +95,102 @@ class CategoryProductController extends Controller
         }
     }
 
+
+    // public function isLeadAssignedForFormType($evaluationFormTypeId)
+    // {
+    //     return $this->evaluatorsAsLeadForFormType($evaluationFormTypeId)->exists();
+    // }
+
+    // // Existing relationship to get evaluators for a specific lead and evaluation form type
+    // public function evaluatorsAsLeadForFormType($evaluationFormTypeId)
+    // {
+    //     return $this->hasMany(Evaluator::class, 'lead_id')
+    //                 ->where('evaluation_form_type_id', $evaluationFormTypeId);
+    // }
+
+
+// try {
+//     return DB::transaction(function () use ($data) {
+//         $data['staff_ids'] = $data['staff_ids'] ?? [];
+//         $isUpdate = $data['update'] ?? false;
+
+//         // Check if the lead is assigned to themselves
+//         if (in_array($data['lead_id'], $data['staff_ids'])) {
+//             return [
+//                 'response' => false,
+//                 'message' => 'Lead cannot be assigned to oneself. Please select a different staff to assign this lead.'
+//             ];
+//         }
+
+//         $lead = DepartmentStaff::findOrFail($data['lead_id']);
+//         $evaluationFormTypeId = $data['evaluation_form_type_id'];
+//         $message = $isUpdate ? 'updated' : 'added';
+
+//         // If 'all' is selected, assign all enabled staff
+//         if (count($data['staff_ids']) == 1 && $data['staff_ids'][0] == 'all') {
+//             $staffIds = DepartmentStaff::whereHas('user', function ($query) {
+//                 $query->where('is_enabled', 1);
+//             })->pluck('id')->toArray();
+
+//             // Delete existing evaluators for the given form type and lead
+//             Evaluator::where('evaluation_form_type_id', $evaluationFormTypeId)
+//                 ->where('lead_id', $lead->id)
+//                 ->delete();
+
+//             // Bulk insert evaluators
+//             $evaluators = array_map(function ($staff_id) use ($lead, $evaluationFormTypeId) {
+//                 return [
+//                     'staff_id' => $staff_id,
+//                     'lead_id' => $lead->id,
+//                     'evaluation_form_type_id' => $evaluationFormTypeId,
+//                 ];
+//             }, $staffIds);
+
+//             Evaluator::insert($evaluators);
+
+//             return [
+//                 'response' => true,
+//                 'message' => "Evaluation lead setting $message successfully"
+//             ];
+//         }
+
+//         // Handle the update or create scenario
+//         if ($isUpdate) {
+//             // Delete existing evaluators for the given form type and lead
+//             Evaluator::where('evaluation_form_type_id', $evaluationFormTypeId)
+//                 ->where('lead_id', $lead->id)
+//                 ->delete();
+//         } else {
+//             $existingStaffIds = $lead->associatedStaffs($evaluationFormTypeId)->pluck('staff_id')->toArray();
+//         }
+
+//         $newEvaluators = [];
+
+//         foreach ($data['staff_ids'] as $staff_id) {
+//             if (!isset($existingStaffIds) || !in_array($staff_id, $existingStaffIds)) {
+//                 $newEvaluators[] = [
+//                     'staff_id' => $staff_id,
+//                     'lead_id' => $lead->id,
+//                     'evaluation_form_type_id' => $evaluationFormTypeId,
+//                 ];
+//             }
+//         }
+
+//         if (!empty($newEvaluators)) {
+//             Evaluator::insert($newEvaluators);
+//         }
+
+//         return [
+//             'response' => true,
+//             'message' => "Evaluation lead setting $message successfully"
+//         ];
+//     });
+// } catch (\Throwable $th) {
+//     return [
+//         'response' => false,
+//         'message' => $th->getMessage()
+//     ];
+// }
+
+
 }
