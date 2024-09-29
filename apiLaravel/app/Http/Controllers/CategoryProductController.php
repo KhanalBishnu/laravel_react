@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PrivateEventTest;
 use App\Models\CategoryProduct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,6 +12,8 @@ class CategoryProductController extends Controller
 {
     public function index(Request $request)
     {
+        event(new PrivateEventTest('test'));
+
         $data=$request->all();
         $page=$data['page'] ?? 1;
         $limit=$data['paginatedValue'] ?? 8;

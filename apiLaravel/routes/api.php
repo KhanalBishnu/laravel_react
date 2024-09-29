@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\NotificationTest;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\CategoryProductController;
@@ -24,6 +25,18 @@ use Illuminate\Support\Facades\Route;
 // Route::get('/user/create',[UserController::class,'index']);
 // Route::post('/user',[UserController::class,'store']);
 
+Route::get('/send-notification', function (Request $request) {
+    $message = 'i am ready';
+    event(new NotificationTest($message));
+    return response()->json(['status' => 'Notification Sent!']);
+});
+
+Route::middleware('auth:api')->get('/user', function (Request $request) {
+    return $request->user();
+});
+Route::middleware('auth:api')->post('/broadcasting/auth', function () {
+    return response()->json(['message' => 'Authenticated']);
+});
 
 Route::post('register',[AuthController::class,'register']);
 Route::post('login',[AuthController::class,'login']);

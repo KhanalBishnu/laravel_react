@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PrivateEventTest;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,6 +17,7 @@ class ProductController extends Controller
         $limit=$data['limit'] ?? 8;
         $offset=($page-1)*$limit;
         $products=Product::with('media')
+        
         ->when(!auth()->user()->hasPermissionTo('View All|Product'),function($q){
             $q->where('user_id',auth()->id());
         });
