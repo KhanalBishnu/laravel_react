@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Events\NotificationTest;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -61,6 +62,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+
         try {
             $validator = Validator::make($request->all(), [
                 'email' => 'required|email',

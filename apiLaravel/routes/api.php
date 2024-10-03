@@ -9,6 +9,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoleAndPermissionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use GuzzleHttp\Exception\RequestException;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -26,6 +28,18 @@ use Illuminate\Support\Facades\Route;
 // Route::post('/user',[UserController::class,'store']);
 
 Route::get('/send-notification', function (Request $request) {
+
+    
+    try {
+        return  true;
+        $client = new \GuzzleHttp\Client();
+    $response = $client->request('GET', 'http://localhost:8000/api/endpoint');
+    dd('true');
+    // Process the response here
+} catch (RequestException $e) {
+    // Log the error message
+    echo 'Request failed: ' . $e->getMessage();
+}
     $message = 'i am ready';
     event(new NotificationTest($message));
     return response()->json(['status' => 'Notification Sent!']);
@@ -39,7 +53,8 @@ Route::middleware('auth:api')->post('/broadcasting/auth', function () {
 });
 
 Route::post('register',[AuthController::class,'register']);
-Route::post('login',[AuthController::class,'login']);
+Route::post('login',[AuthController::class,'login'])->name('login');
+
 Route::post('/products',[ProductController::class,'NoAuthProduct']);
 Route::get('/product/details/{id}',[ProductController::class,'NoAuthProductDetail']);
 

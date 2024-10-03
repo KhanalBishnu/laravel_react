@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\MessageSent;
+use App\Events\NotificationTest;
 use App\Events\PrivateEventTest;
 use App\Models\CategoryProduct;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -12,7 +15,11 @@ class CategoryProductController extends Controller
 {
     public function index(Request $request)
     {
-        event(new PrivateEventTest('test'));
+        event(new PrivateEventTest('df'));
+        // event(new NotificationTest('df'));
+        
+        event(new MessageSent(Auth::user(), 'test'));
+        
 
         $data=$request->all();
         $page=$data['page'] ?? 1;

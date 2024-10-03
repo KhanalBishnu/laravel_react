@@ -27,12 +27,13 @@ return [
             'name' => env('APP_NAME'),
             'key' => env('PUSHER_APP_KEY'),
             'secret' => env('PUSHER_APP_SECRET'),
-            'path' => env('PUSHER_APP_PATH'),
-            'capacity' => null,
+            'host' => env('PUSHER_HOST', '127.0.0.1'),
+            'path' => env('PUSHER_APP_PATH', '/'),
             'enable_client_messages' => false,
             'enable_statistics' => true,
         ],
     ],
+    
 
     /*
      * This class is responsible for finding the apps. The default provider
