@@ -140,3 +140,14 @@ return [
      */
     'channel_manager' => \BeyondCode\LaravelWebSockets\WebSockets\Channels\ChannelManagers\ArrayChannelManager::class,
 ];
+
+// BROADCAST_DRIVER=pusher
+// PUSHER_APP_ID=1872721
+// PUSHER_APP_KEY=9e28377bbc0003448d60
+// PUSHER_APP_SECRET=8d8864cbc5c033d8a89b
+// PUSHER_APP_CLUSTER=mt1
+// PUSHER_HOST=127.0.0.1
+// PUSHER_PORT=6001
+// PUSHER_SCHEME=http
+// PUSHER_APP_TLS=false
+// PUSHER_APP_DEBUG=true
